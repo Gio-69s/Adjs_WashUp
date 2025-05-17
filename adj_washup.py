@@ -7,6 +7,8 @@ root.title("Washup")
 root.geometry("400x400")
 root.config(bg="lightblue")
 
+#Changement du logo de la fenêtre
+root.iconbitmap("C:\Users\giova\Downloads\favicon.ico")
 #Fonction pour demander les noms d'utilisateur et choisit aléatoirement un utilisateur
 
 root_entry1=tk.Entry(root)
@@ -45,3 +47,4 @@ root_label.pack(pady=35)
 
 #Lancer la boucle principale de l'application
 root.mainloop()
+
