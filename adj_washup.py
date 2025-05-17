@@ -8,7 +8,7 @@ root.geometry("400x400")
 root.config(bg="lightblue")
 
 #Changement du logo de la fenêtre
-root.iconbitmap("C:\Users\giova\Downloads\favicon.ico")
+root.iconbitmap("favicon.ico")
 #Fonction pour demander les noms d'utilisateur et choisit aléatoirement un utilisateur
 
 root_entry1=tk.Entry(root)
