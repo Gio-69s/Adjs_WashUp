@@ -1,2 +1,2 @@
 # app-vaisselle
-une application simple et totalement basique qui choisit aleatoirement qui fait la vaisselle a la maison
+An application which helps us to do our differents works at home or anywhere😁.
