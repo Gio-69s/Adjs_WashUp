@@ -2,6 +2,8 @@ import random
 import customtkinter as ctk
 import sqlite3
 
+
+
 #Création de la fenêtre principale
 root = ctk.CTk()
 root.title("Washup")
@@ -27,7 +29,7 @@ root_entry3.pack(pady=30)
 
 def washup():
     try:
-     while True:
+     
         #Demander les noms d'utilisateur
         u1=root_entry1.get()
         u2=root_entry2.get()
@@ -39,10 +41,9 @@ def washup():
         [u for u in list_user if u != ""]
 
         result=random.choice(list_user)
-        root_label=ctk.CTkLabel(root, text=f"Celui fera la vaisselle est {result}")
+        root_label=ctk.CTkLabel(root, text=f"Eh bah aujourd'hui se sera {result}  qui fait la vaisselle !")
         root_label.pack(pady=10 , padx=10)
-        if root_label == root_label:
-           break
+        
     except:
         root_label=ctk.CTkLabel(root, text="Erreur: Veuillez entrer trois noms d'utilisateur")
         root_label.pack(pady=10 , padx=10)
