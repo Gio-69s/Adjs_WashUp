@@ -1,11 +1,15 @@
 import random
 import customtkinter as ctk
 
-
+#Création de la fenêtre principale
 root = ctk.CTk()
 root.title("Washup")
 root.geometry("400x400")
-root.config(bg="lightblue")
+
+#Apparence de la fenetre 
+ctk.set_appearance_mode("system")  # default
+ctk.set_appearance_mode("dark")
+ctk.set_appearance_mode("light")
 
 #Changement du logo de la fenêtre
 root.iconbitmap("favicon.ico")
