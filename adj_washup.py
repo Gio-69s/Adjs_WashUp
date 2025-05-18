@@ -1,5 +1,6 @@
 import random
 import customtkinter as ctk
+import sqlite3
 
 #Création de la fenêtre principale
 root = ctk.CTk()
@@ -40,7 +41,7 @@ def washup():
         result=random.choice(list_user)
         root_label=ctk.CTkLabel(root, text=f"Celui fera la vaisselle est {result}")
         root_label.pack(pady=10 , padx=10)
-        if root_label:
+        if root_label == root_label:
            break
     except:
         root_label=ctk.CTkLabel(root, text="Erreur: Veuillez entrer trois noms d'utilisateur")
