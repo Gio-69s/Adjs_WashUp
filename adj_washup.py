@@ -2,46 +2,6 @@ import random
 import customtkinter as ctk
 import sqlite3
 
-#Création de la base de données
-
-conn = sqlite3.connect('washup.db')
-c = conn.cursor()
-#Création de la table pour stocker les utilisateurs
-c.execute('''CREATE TABLE IF NOT EXISTS users
-             (id INTEGER PRIMARY KEY AUTOINCREMENT,
-             name TEXT NOT NULL)''')
-
-#Fonction pour ajouter un utilisateur à la base de données
-def add_user(name):
-    c.execute("INSERT INTO users (name) VALUES (?)", (name,))
-    conn.commit()
-#Fonction pour récupérer tous les utilisateurs de la base de données
-def get_users():
-    c.execute("SELECT name FROM users")
-    return [row[0] for row in c.fetchall()]
-#Fonction pour supprimer un utilisateur de la base de données
-def delete_user(name):
-    c.execute("DELETE FROM users WHERE name=?", (name,))
-    conn.commit()
-#Fonction pour supprimer tous les utilisateurs de la base de données
-def delete_all_users():
-    c.execute("DELETE FROM users")
-    conn.commit()
-#Fonction pour afficher la liste des utilisateurs
-def show_users():
-    c.execute("SELECT name FROM users")
-    users = c.fetchall()
-    if users:
-        print("Liste des utilisateurs :")
-        for user in users:
-            print(user[0])
-    else:
-        print("Aucun utilisateur trouvé.")
-#Fonction pour fermer la connexion à la base de données
-def close_connection():
-    conn.close()
-
-
 #Création de la fenêtre principale
 root = ctk.CTk()
 root.title("Washup")
@@ -85,6 +45,17 @@ def washup():
     except:
         root_label=ctk.CTkLabel(root, text="Erreur: Veuillez entrer trois noms d'utilisateur")
         root_label.pack(pady=10 , padx=10)
+
+#Connexion à la base de données SQLite
+conn=sqlite3.connect('adj_washup.db')
+curs=conn.cursor()
+
+#Création de la table si elle n'existe pas déjà
+curs.execute('''
+             CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL
+             ''')
 
 
 #Création d'un bouton pour lancer la fonction washup
