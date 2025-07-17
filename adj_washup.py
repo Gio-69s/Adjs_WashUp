@@ -1,6 +1,6 @@
 import random
 import customtkinter as ctk
-import sqlite3
+
 
 #Création de la fenêtre principale
 
@@ -51,33 +51,8 @@ def washup():
     except:
         root_label=ctk.CTkLabel(root, text="Erreur: Veuillez entrer trois noms d'utilisateur")
         root_label.pack(pady=10 , padx=10)
-    #Connexion à la base de données SQLite
 
-    conn=sqlite3.connect('adj_washup.db')
-    cur=conn.cursor()
-
-    #Création de la table si elle n'existe pas déjà
-
-    cur.execute('''
-             CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL
-             ''')
-
-    #Insertion des noms d'utilisateur dans la base de données
-    cur.execute('''
-             INSERT INTO users (username) VALUES (?)
-             ''', (u1,) ,
-                  (u2,) ,
-                  (u3,) )
-    conn.commit()
-
-    #Affichage d'un message de confirmation
-    root_label=ctk.CTkLabel(root, text="Noms d'utilisateur ajoutés à la base de données")
-    root_label.pack(pady=10 , padx=10)
-    #Fermeture de la connexion à la base de données
-    conn.close()
-    
+   
 #Création d'un bouton pour lancer la fonction washup
 button=ctk.CTkButton(root, text="Lancer Washup", command=washup)
 button.pack(pady=40)
