@@ -5,7 +5,7 @@ import customtkinter as ctk
 #Création de la fenêtre principale
 
 root = ctk.CTk()
-root.title("Washup")
+root.title("Adj_Washup")
 root.geometry("400x400")
 
 #Apparence de la fenetre 
