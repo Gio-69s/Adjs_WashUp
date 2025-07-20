@@ -44,10 +44,10 @@ def washup():
 
         [u for u in list_user if u != ""]
 
+       
         result=random.choice(list_user)
-        root_label=ctk.CTkLabel(root, text=f"Eh bah aujourd'hui se sera {result}  qui fait la vaisselle !")
-        root_label.pack(pady=10 , padx=10)
-        
+        root_label=ctk.CTkLabel(root, text=f"Celui qui doit faire la vaisselle est : {result}")
+        root_label.pack(pady=10, padx=10)
     except:
         root_label=ctk.CTkLabel(root, text="Erreur: Veuillez entrer trois noms d'utilisateur")
         root_label.pack(pady=10 , padx=10)
@@ -55,11 +55,11 @@ def washup():
    
 #Création d'un bouton pour lancer la fonction washup
 button=ctk.CTkButton(root, text="Lancer Washup", command=washup)
-button.pack(pady=40)
+button.pack(pady=10)
 
 #Création d'une étiquette pour afficher un message
 root_label=ctk.CTkLabel(root, text="Cliquez sur le bouton pour lancer Washup !")
-root_label.pack(pady=35)
+root_label.pack(pady=15,padx=5)
 
 #Lancer la boucle principale de l'application
 root.mainloop()
