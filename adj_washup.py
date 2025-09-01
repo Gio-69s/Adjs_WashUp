@@ -17,9 +17,12 @@ ctk.set_default_color_theme("blue")
 
 root.iconbitmap("favicon.ico")
 
+#Création du champ de saisie pour le choix de l'activité
 
+root_entry=ctk.CTkEntry(root, placeholder_text="Entrez ici l'activité")
+root_entry.pack(pady=15)
 
-#Fonction pour demander les noms d'utilisateur et choisit aléatoirement un utilisateur
+#Création des champs de saisie pour les noms d'utilisateur
 
 root_entry1=ctk.CTkEntry(root)
 root_entry1.pack(pady=20)
@@ -32,8 +35,17 @@ root_entry3.pack(pady=30)
 
 
 def washup():
+    """
+    Fonction qui choisit un utilisateur au hasard pour effectuer une activité donnée.
+    Récupère l'activité et les noms d'utilisateur à partir des champs de saisie.
+    Cree une liste avec les noms d'utilisateur non vides.
+    Choisit un utilisateur au hasard dans la liste et affiche le résultat dans une étiquette.
+    """
     try:
-     
+        #Récupération de l'activité
+        activity=root_entry.get()
+
+
         #Demander les noms d'utilisateur
         u1=root_entry1.get()
         u2=root_entry2.get()
@@ -44,9 +56,10 @@ def washup():
 
         [u for u in list_user if u != ""]
 
+        #Choisir un utilisateur au hasard dans la liste
        
         result=random.choice(list_user)
-        root_label=ctk.CTkLabel(root, text=f"Celui qui doit faire la vaisselle est : {result}")
+        root_label=ctk.CTkLabel(root, text=f"Celui qui fera :{activity} est : {result}")
         root_label.pack(pady=10, padx=10)
     except:
         root_label=ctk.CTkLabel(root, text="Erreur: Veuillez entrer trois noms d'utilisateur")
