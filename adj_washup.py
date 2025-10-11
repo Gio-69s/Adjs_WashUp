@@ -30,15 +30,35 @@ root_entry2.pack(pady=25)
 root_entry3=ctk.CTkEntry(root)
 root_entry3.pack(pady=30)
 
-
+# Fonction principale qui lance le tirage au sort
 def washup():
     """
-    Fonction qui choisit un utilisateur au hasard pour effectuer une activité donnée.
-    Récupère l'activité et les noms d'utilisateur à partir des champs de saisie.
-    Cree une liste avec les noms d'utilisateur non vides.
-    Choisit un utilisateur au hasard dans la liste et affiche le résultat dans une étiquette.
+    Cette fonction est appelée quand on clique sur le bouton "Lancer Washup".
+    Elle sert à choisir au hasard une personne parmi trois pour réaliser une activité.
+    Voici comment elle fonctionne :
+    1. Elle récupère le nom de l'activité et les trois noms entrés par l'utilisateur.
+    2. Elle vérifie que les champs sont bien remplis.
+    3. Elle utilise une fonction interne pour afficher des points pendant quelques secondes, pour faire patienter.
+    4. Elle choisit un des trois noms au hasard.
+    5. Elle affiche le résultat dans la fenêtre : qui doit faire l'activité.
+    Si jamais il manque un nom, elle affiche un message d'erreur pour prévenir l'utilisateur.
     """
+
+    # Fonction interne qui affiche un temps d'attente
+    def temps_dattente_pour_laffichage(seconde, point="."):
+        """
+        Cette fonction sert à faire patienter l'utilisateur avant d'afficher le résultat.
+        Elle affiche un point à l'écran chaque seconde, pendant le nombre de secondes indiqué.
+        Par exemple, si on met 3 secondes, elle va afficher trois points, un par seconde.
+        Cela permet de créer un petit suspense avant de révéler le nom choisi.
+        """
+        while seconde > 0:
+            print(point, end="")
+            time.sleep(1)
+            seconde -= 1
+                   
     try:
+
         #Récupération de l'activité
         activity=root_entry.get()
 
@@ -54,9 +74,9 @@ def washup():
         [u for u in list_user if u != ""]
 
         #Choisir un utilisateur au hasard dans la liste
-       
+   
         result=random.choice(list_user)
-        root_label=ctk.CTkLabel(root, text=f"Celui qui fera la {activity} est : {result}")
+        root_label=ctk.CTkLabel(root, text=f"Celui qui fera la {activity} est {temps_dattente_pour_laffichage(3)} {result} !!!")
         root_label.pack(pady=10, padx=10)
     except:
         root_label=ctk.CTkLabel(root, text="Erreur: Veuillez entrer trois noms d'utilisateur")
