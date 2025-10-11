@@ -1,5 +1,6 @@
 import random
 import customtkinter as ctk
+import time 
 
 
 #Création de la fenêtre principale
@@ -12,10 +13,6 @@ root.geometry("400x400")
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
-
-#Changement du logo de la fenêtre
-
-root.iconbitmap("favicon.ico")
 
 #Création du champ de saisie pour le choix de l'activité
 
@@ -59,7 +56,7 @@ def washup():
         #Choisir un utilisateur au hasard dans la liste
        
         result=random.choice(list_user)
-        root_label=ctk.CTkLabel(root, text=f"Celui qui fera :{activity} est : {result}")
+        root_label=ctk.CTkLabel(root, text=f"Celui qui fera la {activity} est : {result}")
         root_label.pack(pady=10, padx=10)
     except:
         root_label=ctk.CTkLabel(root, text="Erreur: Veuillez entrer trois noms d'utilisateur")
