@@ -3,9 +3,11 @@ import random
 import customtkinter as ctk
 
 
+# Configure the appearance before creating any widgets.
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
+# Create and configure the main application window.
 root = ctk.CTk()
 root.title("Adj_WashUp")
 root.geometry("460x520")
@@ -24,6 +26,7 @@ subtitle_label = ctk.CTkLabel(
 )
 subtitle_label.pack(pady=(0, 20))
 
+# Input field for the household activity.
 activity_entry = ctk.CTkEntry(
     root,
     width=320,
@@ -31,6 +34,7 @@ activity_entry = ctk.CTkEntry(
 )
 activity_entry.pack(pady=6)
 
+# Create the three participant input fields in a loop.
 participant_entries = []
 for number in range(1, 4):
     entry = ctk.CTkEntry(
@@ -54,7 +58,8 @@ result_label.pack(pady=8)
 
 
 def finish_draw(activity, participants):
-    """Choisit et affiche le participant après l'animation."""
+    """Choose a participant and display the final result."""
+    # random.choice gives every entered participant an equal chance.
     chosen_participant = random.choice(participants)
     result_label.configure(
         text=f"{chosen_participant} doit faire :\n{activity}",
@@ -65,13 +70,16 @@ def finish_draw(activity, participants):
 
 
 def animate_draw(activity, participants, remaining_steps=8):
-    """Anime le tirage sans bloquer la fenêtre."""
+    """Animate the draw without freezing the application window."""
+    # Once the animation is finished, make the real selection.
     if remaining_steps == 0:
         finish_draw(activity, participants)
         return
 
+    # This is only a visual preview, not the final result.
     preview_participant = random.choice(participants)
     result_label.configure(text=f"Tirage en cours...\n{preview_participant}")
+    # after() waits without blocking Tkinter's event loop like sleep() would.
     root.after(
         120,
         lambda: animate_draw(activity, participants, remaining_steps - 1),
@@ -79,15 +87,18 @@ def animate_draw(activity, participants, remaining_steps=8):
 
 
 def washup():
-    """Valide les champs puis démarre un tirage au sort."""
+    """Validate the form and start a random draw."""
+    # strip() removes spaces accidentally typed at the beginning or end.
     activity = activity_entry.get().strip()
     participants = [entry.get().strip() for entry in participant_entries]
 
+    # An activity is required before starting the draw.
     if not activity:
         status_label.configure(text="Veuillez entrer une tâche.", text_color="#fca5a5")
         result_label.configure(text="Le tirage n'a pas commencé.")
         return
 
+    # All three participant names are required for a fair draw.
     if any(not participant for participant in participants):
         status_label.configure(
             text="Veuillez entrer les trois noms.",
@@ -103,7 +114,8 @@ def washup():
 
 
 def clear_form():
-    """Efface les champs et remet l'interface à son état initial."""
+    """Clear all inputs and restore the initial interface state."""
+    # delete(0, "end") removes the complete content of an entry widget.
     activity_entry.delete(0, "end")
     for entry in participant_entries:
         entry.delete(0, "end")
