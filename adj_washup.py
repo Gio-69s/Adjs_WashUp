@@ -1,98 +1,127 @@
 import random
+
 import customtkinter as ctk
-import time 
 
-
-#Création de la fenêtre principale
-
-root = ctk.CTk()
-root.title("Adj_Washup")
-root.geometry("400x400")
-
-#Apparence de la fenetre 
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
-#Création du champ de saisie pour le choix de l'activité
+root = ctk.CTk()
+root.title("Adj_WashUp")
+root.geometry("460x520")
+root.resizable(False, False)
 
-root_entry=ctk.CTkEntry(root, placeholder_text="Entrez ici l'activité")
-root_entry.pack(pady=15)
+title_label = ctk.CTkLabel(
+    root,
+    text="Qui fait la tâche ?",
+    font=ctk.CTkFont(size=24, weight="bold"),
+)
+title_label.pack(pady=(24, 6))
 
-#Création des champs de saisie pour les noms d'utilisateur
+subtitle_label = ctk.CTkLabel(
+    root,
+    text="Entrez une tâche et les trois participants.",
+)
+subtitle_label.pack(pady=(0, 20))
 
-root_entry1=ctk.CTkEntry(root)
-root_entry1.pack(pady=20)
+activity_entry = ctk.CTkEntry(
+    root,
+    width=320,
+    placeholder_text="Tâche à réaliser (ex. faire la vaisselle)",
+)
+activity_entry.pack(pady=6)
 
-root_entry2=ctk.CTkEntry(root)
-root_entry2.pack(pady=25)
+participant_entries = []
+for number in range(1, 4):
+    entry = ctk.CTkEntry(
+        root,
+        width=320,
+        placeholder_text=f"Nom de l'enfant {number}",
+    )
+    entry.pack(pady=6)
+    participant_entries.append(entry)
 
-root_entry3=ctk.CTkEntry(root)
-root_entry3.pack(pady=30)
+status_label = ctk.CTkLabel(root, text="")
+status_label.pack(pady=(18, 4))
 
-# Fonction interne qui affiche un temps d'attente
-def temps_dattente_pour_laffichage(seconde=3, point="."):
-    """
-    Cette fonction sert à faire patienter l'utilisateur avant d'afficher le résultat.
-    Elle affiche un point à l'écran chaque seconde, pendant le nombre de secondes indiqué.
-    Par exemple, si on met 3 secondes, elle va afficher trois points, un par seconde.
-    Cela permet de créer un petit suspense avant de révéler le nom choisi.
-    """
-    #Récupération de l'activité
-    activity=root_entry.get()
-    print("Celui qui fera la {activity} est ",end="")
-    while seconde > 0:
-        print(point, end="")
-        time.sleep(1)
-        seconde -= 1
-        return point
-    
-# Fonction principale qui lance le tirage au sort
+result_label = ctk.CTkLabel(
+    root,
+    text="Le résultat apparaîtra ici.",
+    font=ctk.CTkFont(size=18, weight="bold"),
+    wraplength=380,
+)
+result_label.pack(pady=8)
+
+
+def finish_draw(activity, participants):
+    """Choisit et affiche le participant après l'animation."""
+    chosen_participant = random.choice(participants)
+    result_label.configure(
+        text=f"{chosen_participant} doit faire :\n{activity}",
+        text_color="#5eead4",
+    )
+    status_label.configure(text="Tirage terminé !")
+    draw_button.configure(state="normal")
+
+
+def animate_draw(activity, participants, remaining_steps=8):
+    """Anime le tirage sans bloquer la fenêtre."""
+    if remaining_steps == 0:
+        finish_draw(activity, participants)
+        return
+
+    preview_participant = random.choice(participants)
+    result_label.configure(text=f"Tirage en cours...\n{preview_participant}")
+    root.after(
+        120,
+        lambda: animate_draw(activity, participants, remaining_steps - 1),
+    )
+
+
 def washup():
-    """
-    Cette fonction est appelée quand on clique sur le bouton "Lancer Washup".
-    Elle sert à choisir au hasard une personne parmi trois pour réaliser une activité.
-    Voici comment elle fonctionne :
-    1. Elle récupère le nom de l'activité et les trois noms entrés par l'utilisateur.
-    2. Elle vérifie que les champs sont bien remplis.
-    3. Elle utilise une fonction interne pour afficher des points pendant quelques secondes, pour faire patienter.
-    4. Elle choisit un des trois noms au hasard.
-    5. Elle affiche le résultat dans la fenêtre : qui doit faire l'activité.
-    Si jamais il manque un nom, elle affiche un message d'erreur pour prévenir l'utilisateur.
-    """
-                   
-    try:
+    """Valide les champs puis démarre un tirage au sort."""
+    activity = activity_entry.get().strip()
+    participants = [entry.get().strip() for entry in participant_entries]
 
-        #Demander les noms d'utilisateur
-        u1=root_entry1.get()
-        u2=root_entry2.get()
-        u3=root_entry3.get()
+    if not activity:
+        status_label.configure(text="Veuillez entrer une tâche.", text_color="#fca5a5")
+        result_label.configure(text="Le tirage n'a pas commencé.")
+        return
 
-        #Création d'une liste avec les noms d'utilisateur 
-        list_user=[u1,u2,u3]
+    if any(not participant for participant in participants):
+        status_label.configure(
+            text="Veuillez entrer les trois noms.",
+            text_color="#fca5a5",
+        )
+        result_label.configure(text="Le tirage n'a pas commencé.")
+        return
 
-        [u for u in list_user if u != ""]
+    status_label.configure(text="Bonne chance à tous !", text_color="white")
+    result_label.configure(text="Préparation du tirage...", text_color="white")
+    draw_button.configure(state="disabled")
+    animate_draw(activity, participants)
 
-        #Choisir un utilisateur au hasard dans la liste
-        result=random.choice(list_user)
-        return result
-        root_label=ctk.CTkLabel(root,text=f"{temps_dattente_pour_laffichage}{result}")
-        root_label.pack(pady=10,padx=10)
-        
-    except:
-        root_label=ctk.CTkLabel(root, text="Erreur: Veuillez entrer trois noms d'utilisateur")
-        return root_label
-        root_label.pack(pady=10 , padx=10)
 
-   
-#Création d'un bouton pour lancer la fonction washup
-button=ctk.CTkButton(root, text="Lancer Washup", command=washup)
-button.pack(pady=10)
+def clear_form():
+    """Efface les champs et remet l'interface à son état initial."""
+    activity_entry.delete(0, "end")
+    for entry in participant_entries:
+        entry.delete(0, "end")
+    status_label.configure(text="")
+    result_label.configure(text="Le résultat apparaîtra ici.", text_color="white")
 
-#Création d'une étiquette pour afficher un message
-root_label=ctk.CTkLabel(root, text="Cliquez sur le bouton pour lancer Washup !")
-root_label.pack(pady=15,padx=5)
 
-#Lancer la boucle principale de l'application
+draw_button = ctk.CTkButton(root, text="Lancer le tirage", command=washup)
+draw_button.pack(pady=(20, 8))
+
+clear_button = ctk.CTkButton(
+    root,
+    text="Effacer",
+    command=clear_form,
+    fg_color="transparent",
+    border_width=1,
+)
+clear_button.pack()
+
 root.mainloop()
 
