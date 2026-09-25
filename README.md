@@ -1,12 +1,14 @@
 # Adj_WashUp
 
-Une petite application de bureau en Python qui choisit au hasard la personne chargée d'une tâche ménagère.
+Une petite application de bureau en Python qui répartit au hasard trois tâches ménagères entre trois enfants.
 
 ## Fonctionnalités
 
-- Saisir une tâche à réaliser.
+- Saisir trois tâches ménagères différentes.
 - Saisir les noms de trois participants.
-- Lancer un tirage au sort animé.
+- Lancer un tirage au sort animé qui attribue une tâche différente à chaque enfant.
+- Éviter qu'un enfant reçoive la même tâche deux jours de suite.
+- Conserver le tirage du jour et l'historique dans `~/.adj_washup_history.json`.
 - Effacer le formulaire pour recommencer.
 
 ## Prérequis
@@ -37,7 +39,7 @@ Lancez l'application avec :
 python adj_washup.py
 ```
 
-Entrez une tâche, les trois noms, puis cliquez sur **Lancer le tirage**. Chaque participant a la même probabilité d'être choisi.
+Entrez les trois tâches et les trois noms, puis cliquez sur **Lancer le tirage**. Chaque tâche est attribuée à un seul enfant. Le tirage du jour est conservé ; le lendemain, les affectations qui répètent la tâche de la veille sont exclues. L'historique est stocké dans le dossier personnel de l'utilisateur.
 
 ## Technologies
 

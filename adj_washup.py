@@ -1,4 +1,8 @@
+import itertools
+import json
 import random
+from datetime import date, timedelta
+from pathlib import Path
 
 import customtkinter as ctk
 
@@ -10,36 +14,41 @@ ctk.set_default_color_theme("blue")
 # Create and configure the main application window.
 root = ctk.CTk()
 root.title("Adj_WashUp")
-root.geometry("460x520")
+root.geometry("480x700")
 root.resizable(False, False)
+
+HISTORY_PATH = Path.home() / ".adj_washup_history.json"
 
 title_label = ctk.CTkLabel(
     root,
-    text="Qui fait la tâche ?",
+    text="Répartition des tâches",
     font=ctk.CTkFont(size=24, weight="bold"),
 )
 title_label.pack(pady=(24, 6))
 
 subtitle_label = ctk.CTkLabel(
     root,
-    text="Entrez une tâche et les trois participants.",
+    text="Entrez les trois tâches et les trois enfants.",
 )
 subtitle_label.pack(pady=(0, 20))
 
-# Input field for the household activity.
-activity_entry = ctk.CTkEntry(
-    root,
-    width=320,
-    placeholder_text="Tâche à réaliser (ex. faire la vaisselle)",
-)
-activity_entry.pack(pady=6)
+# Create the three household task fields.
+activity_entries = []
+for number in range(1, 4):
+    entry = ctk.CTkEntry(
+        root,
+        width=340,
+        placeholder_text=f"Tâche {number} (ex. faire la vaisselle)",
+    )
+    entry.pack(pady=6)
+    activity_entries.append(entry)
 
-# Create the three participant input fields in a loop.
+# Create the three participant input fields.
 participant_entries = []
 for number in range(1, 4):
     entry = ctk.CTkEntry(
         root,
-        width=320,
+        width=340,
         placeholder_text=f"Nom de l'enfant {number}",
     )
     entry.pack(pady=6)
@@ -50,77 +59,158 @@ status_label.pack(pady=(18, 4))
 
 result_label = ctk.CTkLabel(
     root,
-    text="Le résultat apparaîtra ici.",
-    font=ctk.CTkFont(size=18, weight="bold"),
-    wraplength=380,
+    text="Les affectations apparaîtront ici.",
+    font=ctk.CTkFont(size=16, weight="bold"),
+    wraplength=400,
 )
 result_label.pack(pady=8)
 
 
-def finish_draw(activity, participants):
-    """Choose a participant and display the final result."""
-    # random.choice gives every entered participant an equal chance.
-    chosen_participant = random.choice(participants)
-    result_label.configure(
-        text=f"{chosen_participant} doit faire :\n{activity}",
-        text_color="#5eead4",
+def load_history():
+    """Load the previous daily assignment, if one is available."""
+    try:
+        with HISTORY_PATH.open(encoding="utf-8") as history_file:
+            history = json.load(history_file)
+    except (OSError, json.JSONDecodeError):
+        return None
+    return history if isinstance(history, dict) else None
+
+
+def save_history(assignments):
+    """Persist today's assignment so tomorrow's draw can avoid repeats."""
+    with HISTORY_PATH.open("w", encoding="utf-8") as history_file:
+        json.dump(
+            {"date": date.today().isoformat(), "assignments": assignments},
+            history_file,
+            ensure_ascii=False,
+            indent=2,
+        )
+
+
+def format_assignments(assignments):
+    return "\n".join(
+        f"{participant} : {activity}"
+        for participant, activity in assignments.items()
     )
-    status_label.configure(text="Tirage terminé !")
+
+
+def choose_assignments(activities, participants, previous_assignments):
+    """Choose a random one-to-one assignment without yesterday's repeats."""
+    possibilities = []
+    for activity_order in itertools.permutations(activities):
+        assignment = dict(zip(participants, activity_order))
+        if all(
+            previous_assignments.get(participant) != activity
+            for participant, activity in assignment.items()
+        ):
+            possibilities.append(assignment)
+    return random.choice(possibilities)
+
+
+def finish_draw(activities, participants, previous_assignments):
+    """Choose and display the final assignment for all three children."""
+    assignments = choose_assignments(activities, participants, previous_assignments)
+    result_label.configure(text=format_assignments(assignments), text_color="#5eead4")
+    try:
+        save_history(assignments)
+        status_label.configure(text="Tirage terminé !")
+    except OSError:
+        status_label.configure(
+            text="Tirage terminé, mais l'historique n'a pas pu être sauvegardé.",
+            text_color="#fca5a5",
+        )
     draw_button.configure(state="normal")
 
 
-def animate_draw(activity, participants, remaining_steps=8):
+def animate_draw(activities, participants, previous_assignments, remaining_steps=8):
     """Animate the draw without freezing the application window."""
-    # Once the animation is finished, make the real selection.
     if remaining_steps == 0:
-        finish_draw(activity, participants)
+        finish_draw(activities, participants, previous_assignments)
         return
 
-    # This is only a visual preview, not the final result.
-    preview_participant = random.choice(participants)
-    result_label.configure(text=f"Tirage en cours...\n{preview_participant}")
-    # after() waits without blocking Tkinter's event loop like sleep() would.
+    preview = choose_assignments(activities, participants, previous_assignments)
+    result_label.configure(text=f"Tirage en cours...\n{format_assignments(preview)}")
     root.after(
         120,
-        lambda: animate_draw(activity, participants, remaining_steps - 1),
+        lambda: animate_draw(
+            activities,
+            participants,
+            previous_assignments,
+            remaining_steps - 1,
+        ),
     )
 
 
 def washup():
     """Validate the form and start a random draw."""
-    # strip() removes spaces accidentally typed at the beginning or end.
-    activity = activity_entry.get().strip()
+    activities = [entry.get().strip() for entry in activity_entries]
     participants = [entry.get().strip() for entry in participant_entries]
 
-    # An activity is required before starting the draw.
-    if not activity:
-        status_label.configure(text="Veuillez entrer une tâche.", text_color="#fca5a5")
+    if any(not activity for activity in activities):
+        status_label.configure(text="Veuillez entrer les trois tâches.", text_color="#fca5a5")
         result_label.configure(text="Le tirage n'a pas commencé.")
         return
 
-    # All three participant names are required for a fair draw.
-    if any(not participant for participant in participants):
+    if len({activity.casefold() for activity in activities}) != 3:
         status_label.configure(
-            text="Veuillez entrer les trois noms.",
+            text="Les trois tâches doivent être différentes.",
             text_color="#fca5a5",
         )
         result_label.configure(text="Le tirage n'a pas commencé.")
         return
 
+    if any(not participant for participant in participants):
+        status_label.configure(text="Veuillez entrer les trois noms.", text_color="#fca5a5")
+        result_label.configure(text="Le tirage n'a pas commencé.")
+        return
+
+    if len({participant.casefold() for participant in participants}) != 3:
+        status_label.configure(
+            text="Les trois enfants doivent avoir des noms différents.",
+            text_color="#fca5a5",
+        )
+        result_label.configure(text="Le tirage n'a pas commencé.")
+        return
+
+    history = load_history()
+    today = date.today()
+    if history and history.get("date") == today.isoformat():
+        saved_assignments = history.get("assignments", {})
+        if (
+            isinstance(saved_assignments, dict)
+            and set(saved_assignments) == set(participants)
+            and set(saved_assignments.values()) == set(activities)
+        ):
+            result_label.configure(
+                text=format_assignments(saved_assignments),
+                text_color="#5eead4",
+            )
+            status_label.configure(text="Le tirage du jour est déjà effectué.")
+            return
+
+    previous_assignments = {}
+    if history and history.get("date") in {
+        today.isoformat(),
+        (today - timedelta(days=1)).isoformat(),
+    }:
+        stored_assignments = history.get("assignments", {})
+        if isinstance(stored_assignments, dict):
+            previous_assignments = stored_assignments
+
     status_label.configure(text="Bonne chance à tous !", text_color="white")
     result_label.configure(text="Préparation du tirage...", text_color="white")
     draw_button.configure(state="disabled")
-    animate_draw(activity, participants)
+    animate_draw(activities, participants, previous_assignments)
 
 
 def clear_form():
     """Clear all inputs and restore the initial interface state."""
-    # delete(0, "end") removes the complete content of an entry widget.
-    activity_entry.delete(0, "end")
+    for entry in activity_entries:
+        entry.delete(0, "end")
     for entry in participant_entries:
         entry.delete(0, "end")
     status_label.configure(text="")
-    result_label.configure(text="Le résultat apparaîtra ici.", text_color="white")
+    result_label.configure(text="Les affectations apparaîtront ici.", text_color="white")
 
 
 draw_button = ctk.CTkButton(root, text="Lancer le tirage", command=washup)
