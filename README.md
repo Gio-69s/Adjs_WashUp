@@ -8,7 +8,7 @@ Une petite application de bureau en Python qui répartit au hasard trois tâches
 - Saisir les noms de trois participants.
 - Lancer un tirage au sort animé qui attribue une tâche différente à chaque enfant.
 - Éviter qu'un enfant reçoive la même tâche deux jours de suite.
-- Conserver le tirage du jour et l'historique dans `~/.adj_washup_history.json`.
+- Conserver le dernier tirage et l'historique dans `~/.adj_washup_history.json`.
 - Effacer le formulaire pour recommencer.
 
 ## Prérequis
@@ -39,7 +39,7 @@ Lancez l'application avec :
 python adj_washup.py
 ```
 
-Entrez les trois tâches et les trois noms, puis cliquez sur **Lancer le tirage**. Chaque tâche est attribuée à un seul enfant. Le tirage du jour est conservé ; le lendemain, les affectations qui répètent la tâche de la veille sont exclues. L'historique est stocké dans le dossier personnel de l'utilisateur.
+Entrez les trois tâches et les trois noms, puis cliquez sur **Lancer le tirage**. Chaque tâche est attribuée à un seul enfant. Vous pouvez relancer le tirage avec les mêmes entrées : les tâches du tirage précédent sont alors exclues. L'historique du dernier tirage est stocké dans le dossier personnel de l'utilisateur.
 
 ## Technologies
 

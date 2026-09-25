@@ -174,20 +174,6 @@ def washup():
 
     history = load_history()
     today = date.today()
-    if history and history.get("date") == today.isoformat():
-        saved_assignments = history.get("assignments", {})
-        if (
-            isinstance(saved_assignments, dict)
-            and set(saved_assignments) == set(participants)
-            and set(saved_assignments.values()) == set(activities)
-        ):
-            result_label.configure(
-                text=format_assignments(saved_assignments),
-                text_color="#5eead4",
-            )
-            status_label.configure(text="Le tirage du jour est déjà effectué.")
-            return
-
     previous_assignments = {}
     if history and history.get("date") in {
         today.isoformat(),
